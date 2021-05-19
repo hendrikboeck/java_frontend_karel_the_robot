@@ -1,4 +1,4 @@
-package karellib;
+package com.github.hendrikboeck.karel;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,7 +19,7 @@ public class TCPClient {
       System.err.println("ERROR: could not create socket: " + e.toString());
       System.exit(1);
     }
-  }q12
+  }
 
   public void send(String data) {
     try {
