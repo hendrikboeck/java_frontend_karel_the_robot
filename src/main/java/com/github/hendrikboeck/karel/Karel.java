@@ -1,30 +1,49 @@
 package com.github.hendrikboeck.karel;
 
+import java.io.IOException;
+
 import org.json.simple.JSONObject;
 
 public abstract class Karel {
 
-  private static void atexit() {
+  private static Object executeCommand(String cmdName, JSONObject cmdArgs) {
     var pipe = Pipe.getInstance();
     var cid = pipe.getCID();
 
-    pipe.send(PCommand.create(cid, "close", null));
+    pipe.send(PCommand.create(cid, cmdName, cmdArgs));
     var result = PCommand.verify(cid, pipe.recv()).get("result");
     
     PCommand.checkOnError(result);
-    pipe.close();
+    return result;
+  }
+
+  private static void atexit() {
+    executeCommand("EOS", null);
+    Pipe.getInstance().close();
   }
 
   public static void loadWorld(String name) {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
+    try {
+      var os = System.getProperty("os.name").toLowerCase();
+      var isWindows = os.contains("win");
+      var pbeExe = isWindows ? "./pbe/run_karel_pbe.bat" : "./pbe/run_karel_pbe.sh";
+      Runtime.getRuntime().exec(pbeExe);
+    } catch (IOException e) {
+      System.err.println("Karel: Could not spawn PBE-Process: " + e);
+      System.exit(1);
+    }
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      System.err.println("Karel: Waiting on PBE-Process has been interrupted: " + e);
+      System.exit(1);
+    }
+
     var mapArgs = new JSONObject();
     mapArgs.put("map", name);
 
-    pipe.send(PCommand.create(cid, "loadWorld", mapArgs));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-    
-    PCommand.checkOnError(result);
+    executeCommand("loadWorld", mapArgs);
 
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
@@ -34,47 +53,23 @@ public abstract class Karel {
   }
 
   public static void move() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "move", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
+    executeCommand("move", null);
   }
 
   public static void turnLeft() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "turnLeft", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
+    executeCommand("turnLeft", null);
   }
 
   public static void pickBeeper() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "pickBeeper", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
+    executeCommand("pickBeeper", null);
   }
 
   public void putBeeper() {
+    executeCommand("putBeeper", null);
   }
 
   public boolean frontIsClear() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "frontIsClear", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("frontIsClear", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -83,14 +78,7 @@ public abstract class Karel {
   }
 
   public boolean rightIsClear() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "rightIsClear", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("rightIsClear", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -99,14 +87,7 @@ public abstract class Karel {
   }
 
   public boolean leftIsClear() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "leftIsClear", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("leftIsClear", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -115,14 +96,7 @@ public abstract class Karel {
   }
 
   public boolean beeperInBag() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "beeperInBag", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("beeperInBag", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -131,14 +105,7 @@ public abstract class Karel {
   }
 
   public boolean beeperPresent() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "beeperPresent", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("beeperPresent", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -147,14 +114,7 @@ public abstract class Karel {
   }
 
   public boolean facingNorth() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "facingNorth", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("facingNorth", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -163,14 +123,7 @@ public abstract class Karel {
   }
 
   public boolean facingEast() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "facingEast", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("facingEast", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -179,14 +132,7 @@ public abstract class Karel {
   }
 
   public boolean facingSouth() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "facingSouth", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("facingSouth", null);
     return ((Boolean)result).booleanValue();
   }
 
@@ -195,14 +141,7 @@ public abstract class Karel {
   }
 
   public boolean facingWest() {
-    var pipe = Pipe.getInstance();
-    var cid = pipe.getCID();
-
-    pipe.send(PCommand.create(cid, "facingWest", null));
-    var result = PCommand.verify(cid, pipe.recv()).get("result");
-
-    PCommand.checkOnError(result);
-
+    var result = executeCommand("facingWest", null);
     return ((Boolean)result).booleanValue();
   }
 
