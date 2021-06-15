@@ -16,45 +16,14 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.      */
 /******************************************************************************/
 
-package com.github.hendrikboeck.karel;
+package com.github.hendrikboeck.karel.examples;
 
-public class Pipe {
+import com.github.hendrikboeck.karel.Karel;
 
-  public static String HOST = "127.0.0.1";
-  public static int PORT = 14480;
+public class HelloWorld extends Karel {
 
-  private static Pipe instance;
-
-  private int id;
-  private TCPClient client;
-
-  private Pipe() {
-    id = 0;
-    client = new TCPClient();
-    client.connect(HOST, PORT);
+  public HelloWorld() {
+    loadWorld("1x1");
   }
-
-  public static Pipe getInstance() {
-    if (instance == null) instance = new Pipe();
-    return instance;
-  }
-
-  public void send(String data) {
-    client.send(data);
-  }
-
-  public String recv() {
-    return client.recv();
-  }
-
-  public void close() {
-    client.close();
-  }
-
-  public int getCID() {
-    return id++;
-  }
-
-  
 
 }

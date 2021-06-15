@@ -1,3 +1,21 @@
+/******************************************************************************/
+/* karel_the_robot_java_frontend                                              */
+/* Copyright (C) 2021  Hendrik Boeck <hendrikboeck.dev@protonmail.com>        */
+/*                                                                            */
+/* This program is free software: you can redistribute it and/or modify       */
+/* it under the terms of the GNU General Public License as published by       */
+/* the Free Software Foundation, either version 3 of the License, or          */
+/* (at your option) any later version.                                        */
+/*                                                                            */
+/* This program is distributed in the hope that it will be useful,            */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of             */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              */
+/* GNU General Public License for more details.                               */
+/*                                                                            */
+/* You should have received a copy of the GNU General Public License          */
+/* along with this program.  If not, see <http://www.gnu.org/licenses/>.      */
+/******************************************************************************/
+
 package com.github.hendrikboeck.karel;
 
 import java.io.StringWriter;
@@ -10,12 +28,11 @@ import org.json.simple.parser.ParseException;
 public abstract class PCommand {
 
   public static String create(int cid, String funcName, JSONObject args) {
-    if(args == null) args = new JSONObject();
-
+    var pargs = (args == null) ? new JSONObject() : args;
     var json = new JSONObject();
     json.put("id", cid);
     json.put("function", funcName);
-    json.put("args", args);
+    json.put("args", pargs);
     
     try {
       var out = new StringWriter();

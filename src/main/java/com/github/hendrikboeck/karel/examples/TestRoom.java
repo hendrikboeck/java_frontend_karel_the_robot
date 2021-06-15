@@ -16,59 +16,45 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.      */
 /******************************************************************************/
 
-package com.github.hendrikboeck.karel;
+package com.github.hendrikboeck.karel.examples;
 
-import java.io.*;
-import java.net.Socket;
+import com.github.hendrikboeck.karel.Karel;
 
-public class TCPClient {
+public class TestRoom extends Karel {
 
-  private static final int MAX_PACKET_SIZE = 65535;
-  private Socket sock;
+  public TestRoom() {
+    loadWorld("TestRoom");
 
-  public TCPClient() {
-    sock = null;
-  }
+    move();
+    turnLeft();
 
-  public void connect(String ip, int port) {
-    try {
-      sock = new Socket(ip, port);
-    } catch (IOException e) {
-      System.err.println("ERROR: could not create socket: " + e.toString());
-      System.exit(1);
+    while (frontIsClear()) move();
+
+    while (frontIsBlocked()) {
+      turnLeft();
+      move();
+      turnRight();
+    }
+
+    var counter = 0;
+    while (frontIsClear()) {
+      while (beeperPresent()) {
+        pickBeeper();
+        counter++;
+      }
+      move();
+    }
+
+    while(counter > 0) {
+      putBeeper();
+      counter--;
     }
   }
 
-  public void send(String data) {
-    try {
-      var writer = new PrintWriter(new OutputStreamWriter(sock.getOutputStream()));
-      writer.print(data);
-      writer.flush();
-    } catch (IOException e) {
-      System.err.println("ERROR: could not send to server: " + e.toString());
-      System.exit(1);
-    }
-  }
-
-  public String recv() {
-    try {
-      var reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-      var buff = new char[MAX_PACKET_SIZE];
-      var numRecvBytes = reader.read(buff, 0, MAX_PACKET_SIZE);
-      return new String(buff, 0, numRecvBytes);
-    } catch (IOException e) {
-      System.err.println("ERROR: could not recv from server: " + e.toString());
-      System.exit(1);
-    }
-    return null;
-  }
-
-  public void close() {
-    try {
-      sock.close();
-    } catch (IOException e) {
-      System.err.println("ERROR: could not close socket: " + e.toString());
-    }
+  public void turnRight() {
+    turnLeft();
+    turnLeft();
+    turnLeft();
   }
 
 }
